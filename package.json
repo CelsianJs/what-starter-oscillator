@@ -1,0 +1,30 @@
+{
+  "name": "what-starter-oscillator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser music studio starter built with What Framework and Web Audio.",
+  "engines": {
+    "node": ">=22 <23"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && node scripts/generate-static-aliases.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run",
+    "smoke": "npm run build && node tests/smoke.mjs",
+    "deploy": "npm run build && vura-platform deploy",
+    "deploy:prod": "npm run build && vura-platform deploy --prod"
+  },
+  "dependencies": {
+    "what-framework": "0.13.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "playwright": "1.63.0",
+    "vite": "^6.3.6",
+    "vitest": "4.1.11",
+    "what-compiler": "0.13.10",
+    "vura-platform": "0.3.0"
+  }
+}

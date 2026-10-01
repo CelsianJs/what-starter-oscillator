@@ -1,0 +1,28 @@
+{
+  "headers": [
+    {
+      "source": "/",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate, no-transform"
+      }
+    },
+    {
+      "source": "/studio",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate, no-transform"
+      }
+    },
+    {
+      "source": "/build",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate, no-transform"
+      }
+    },
+    {
+      "source": "/404",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate, no-transform"
+      }
+    }
+  ]
+}
