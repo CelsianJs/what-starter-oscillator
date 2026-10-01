@@ -6,6 +6,7 @@ Oscillator is a What Framework starter for a browser music studio. It includes a
 
 ```bash
 npm ci
+npx playwright install chromium
 npm run dev
 ```
 
@@ -22,6 +23,8 @@ npm run smoke        # Playwright browser flow and screenshots
 npm run deploy       # Vura preview deploy, requires auth
 npm run deploy:prod  # Vura production deploy, requires auth
 ```
+
+On minimal Linux CI images that do not already include browser system libraries, use `npx playwright install --with-deps chromium` before `npm run smoke`.
 
 ## What it demonstrates
 
