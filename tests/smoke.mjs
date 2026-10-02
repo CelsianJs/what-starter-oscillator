@@ -40,13 +40,32 @@ try {
   await page.screenshot({ path: 'test-artifacts/oscillator-desktop-home.png', fullPage: true });
 
   await page.goto(`${baseURL}/studio`, { waitUntil: 'networkidle' });
+  const stepHeaderCount = await page.locator('.step-numbers span').count();
+  if (stepHeaderCount !== 16) {
+    throw new Error(`Expected 16 visible step header numbers, found ${stepHeaderCount}`);
+  }
+  const desktopStepColumns = await page.locator('.step-numbers').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+  if (desktopStepColumns !== 16) {
+    throw new Error(`Desktop step header is not a 16-column ruler: ${desktopStepColumns}`);
+  }
+  const stoppedPlayingCount = await page.locator('.step.playing').count();
+  if (stoppedPlayingCount !== 0) {
+    throw new Error(`Stopped transport should not show a playhead outline; found ${stoppedPlayingCount}`);
+  }
   await page.getByRole('button', { name: /Slow Bloom/i }).click();
   await page.getByRole('button', { name: 'Kick step 2' }).click();
   await page.getByRole('button', { name: 'Mute' }).first().click();
   await page.getByRole('button', { name: 'Export JSON' }).click();
   await page.getByRole('heading', { name: /Patch, play, mute, solo, save, export/i }).waitFor();
+  await page.screenshot({ path: 'test-artifacts/oscillator-desktop-studio.png', fullPage: true });
 
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${baseURL}/studio`, { waitUntil: 'networkidle' });
+  const mobileStepColumns = await page.locator('.step-numbers').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+  if (mobileStepColumns !== 8) {
+    throw new Error(`Mobile step header should wrap as 8 columns, found ${mobileStepColumns}`);
+  }
+  await page.screenshot({ path: 'test-artifacts/oscillator-mobile-studio.png', fullPage: true });
   await page.goto(`${baseURL}/build`, { waitUntil: 'networkidle' });
   await page.getByRole('heading', { name: /How Oscillator is built/i }).waitFor();
   await page.screenshot({ path: 'test-artifacts/oscillator-mobile-build.png', fullPage: true });

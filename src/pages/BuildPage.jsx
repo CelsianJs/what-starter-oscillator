@@ -17,6 +17,10 @@ export default function BuildPage() {
           <p>The sequencer uses real buttons for every step, plus visible mute, solo, gain, tune, tempo, swing, save, reset, and export controls. Nothing depends on hover-only or canvas-only input.</p>
         </article>
         <article>
+          <h2>Ruler and playhead fix</h2>
+          <p>The step ruler is a dedicated <code>.step-numbers</code> grid with sixteen cells on desktop and two rows of eight on mobile. The playhead outline is gated by <code>isPlaying()</code>, so a stopped pattern never looks like it is already running.</p>
+        </article>
+        <article>
           <h2>Limitations</h2>
           <p>Audio starts only after a user gesture and requires Web Audio support. Local save is browser-local storage. Export is a client-side JSON download.</p>
         </article>

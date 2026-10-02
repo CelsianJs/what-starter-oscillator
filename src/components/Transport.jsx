@@ -13,7 +13,7 @@ export default function Transport() {
     <section class="transport" aria-labelledby="transport-title">
       <div>
         <p class="eyebrow">Transport</p>
-        <h2 id="transport-title">Explicit audio start, clear stop, live timing.</h2>
+        <h2 id="transport-title">Start audio. Stop cleanly. Keep timing live.</h2>
         <p class="status" aria-live="polite">{() => browserError() || audioStatus()}</p>
       </div>
       <div class="transport-controls">

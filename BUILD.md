@@ -100,6 +100,31 @@ export async function startEngine() {
 
 After, `startingPromise` coalesces simultaneous starts and `startGeneration` cancels stale completions if stop/dispose wins the race. The lifecycle tests cover simultaneous starts, stop-before-resume, and dispose-before-resume.
 
+## Real issue: ruler grid and stopped playhead
+
+The visual review caught a high-confidence UI bug in the sequencer: the old header emitted a blank span plus sixteen numbers into a two-column parent grid, then hid the final child with CSS. That made the ruler read as two vertical columns and removed step 16.
+
+The fix gives the numbers their own grid:
+
+```jsx
+<div class="step-header" aria-hidden="true">
+  <span class="track-header">Track</span>
+  <div class="step-numbers">
+    {stepNumbers.map(step => <span>{step + 1}</span>)}
+  </div>
+</div>
+```
+
+`.step-numbers` uses the same sixteen-column grid as the step buttons, then switches to eight columns below the mobile breakpoint. The smoke test now checks both computed grid counts.
+
+The same pass found a state bug: because `currentStep()` starts at `0`, every track showed a green playhead outline on step 1 while the status said "Audio stopped." The class is now gated on real transport state:
+
+```jsx
+isPlaying() && currentStep() === step && 'playing'
+```
+
+That protects users from mistaking a loaded pattern for active playback and keeps the visual state tied to the Web Audio engine lifecycle.
+
 ## Persistence and export boundaries
 
 Saved patterns use `localStorage` when it is available. The loader sanitizes saved JSON before it reaches the signal so malformed storage cannot put the UI into an impossible state.
@@ -111,6 +136,7 @@ Export stays browser-native: it creates JSON for download and attempts clipboard
 - Keeping `activeSteps`, solo state, and transport labels as computed values made the UI reactive without extra effect wiring.
 - Explicit routes made the demo easy to statically alias for Vura.
 - The sample-free synth kept the starter portable: no audio assets, no worker bundle, and no remote dependency.
+- Splitting the ruler into its own grid made the layout easier to reason about than hiding a child of a mixed grid.
 
 ## Verification
 
@@ -120,7 +146,7 @@ Expected gates:
 npm ci
 npm run test
 npm run build
-npm run test:browser
+npm run smoke
 ```
 
-The important regression proof is `src/audio/engine.lifecycle.test.js`. Browser smoke tests are still useful for controls, routing, and layout, but the Web Audio race needed a focused unit test because it depends on async scheduling order.
+The important lifecycle regression proof is `src/audio/engine.lifecycle.test.js`. Browser smoke tests cover controls, routing, the sixteen-cell ruler, the stopped playhead state, and desktop/mobile studio screenshots. The Web Audio race still needs the focused unit test because it depends on async scheduling order.
