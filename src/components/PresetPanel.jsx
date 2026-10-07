@@ -1,5 +1,5 @@
 import { presets } from '../data/presets.js';
-import { currentPresetId, exportPattern, loadPreset, resetSavedPattern, savePattern } from '../state/studio.js';
+import { currentPresetId, exportPattern, loadPreset, memoryStatus, resetSavedPattern, savePattern } from '../state/studio.js';
 
 export default function PresetPanel() {
   const copyExport = async () => {
@@ -34,6 +34,7 @@ export default function PresetPanel() {
         <button class="button ghost danger" onClick={resetSavedPattern}>Reset saved</button>
       </div>
       <p class="note">Local save uses <code>localStorage</code>. Export downloads a JSON pattern and tries to copy it to your clipboard.</p>
+      <p class="memory-status" aria-live="polite">{memoryStatus}</p>
     </aside>
   );
 }

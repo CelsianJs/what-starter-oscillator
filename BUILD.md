@@ -138,7 +138,28 @@ Export stays browser-native: it creates JSON for download and attempts clipboard
 - The sample-free synth kept the starter portable: no audio assets, no worker bundle, and no remote dependency.
 - Splitting the ruler into its own grid made the layout easier to reason about than hiding a child of a mixed grid.
 
-## Verification
+## Patch identity and storage boundaries
+
+The selected preset is now derived from the complete current pattern, not a separate default label. An edited pattern is custom even when it retains its source name. `savedSnapshot` independently tracks whether the current pattern changed since the session snapshot or last successful save.
+
+```js
+export const currentPresetId = computed(() => presets.find((preset) =>
+  JSON.stringify(preset) === JSON.stringify(pattern()))?.id || '');
+export const hasUnsavedChanges = computed(() =>
+  JSON.stringify(pattern()) !== savedSnapshot());
+```
+
+Problem: saving Slow Bloom restored its notes and tempo but highlighted Brass Grid. Fix: derive preset identity from restored data. Proof: a regression saves, reloads the module, and verifies the matching preset; smoke repeats that flow in a browser. A custom edit clears preset highlighting without discarding source identity.
+
+Problem: denied storage threw from save/reset. Fix: catch each browser boundary and update `memoryStatus`; do not change the saved snapshot or current pattern after a failed write/remove. The user can keep editing and export JSON. Unit and browser tests deliberately deny both operations.
+
+The studio is an instrument workspace, not another landing page. A compact patch register and transport precede the sequencer; memory follows the instrument on mobile. Beat-start rules group sixteen steps in fours. Gain and tune show exact numbers. The existing engine and transport cleanup remain unchanged, including coalesced starts and stop/dispose cancellation races.
+
+What stayed smooth: computed identity fitted the existing signals without extra effects, JSON export required no service, and the original sixteen-cell ruler and stopped-playhead checks remained useful. No new dependencies or audio assets were introduced.
+
+## Verification commands
+
+The mobile guide needed its own layout regression: an uncontained `pre` gave the grid card a minimum content width wider than the390px document. Guide cards now use `min-width: 0`; code blocks retain literal whitespace and scroll inside their maximum width. The smoke checks document width with both normal code fonts and an intentionally wider Courier fallback. This containment is scoped to the guide, not the working instrument.
 
 Expected gates:
 
