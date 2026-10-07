@@ -23,12 +23,12 @@ export default function Sequencer() {
             </div>
             <div class="tone-controls">
               <label>
-                <span>Gain</span>
+                <span>Gain {Math.round(track.gain * 100)}%</span>
                 <input type="range" min="0" max="1" step="0.01" value={track.gain} onInput={(event) => setTrackGain(track.id, event.target.value)} />
               </label>
               <label>
-                <span>Tune</span>
-                <input type="range" min="30" max="9000" value={track.frequency} onInput={(event) => setTrackFrequency(track.id, event.target.value)} />
+                <span>Tune {track.frequency} Hz</span>
+                <input type="range" min="20" max="9000" value={track.frequency} onInput={(event) => setTrackFrequency(track.id, event.target.value)} />
               </label>
             </div>
           </div>
@@ -43,6 +43,7 @@ export default function Sequencer() {
                 ].filter(Boolean).join(' ')}
                 aria-label={`${track.name} step ${step + 1}`}
                 aria-pressed={enabled ? 'true' : 'false'}
+                data-beat-start={step % 4 === 0 ? 'true' : 'false'}
                 onClick={() => toggleStep(track.id, step)}
               >
                 <span>{step + 1}</span>

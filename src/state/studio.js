@@ -1,6 +1,6 @@
 import { computed, signal } from 'what-framework';
 import { presets, STEPS } from '../data/presets.js';
-import { clonePattern, sanitizePattern } from '../utils/pattern.js';
+import { clonePattern, isValidPattern, sanitizePattern } from '../utils/pattern.js';
 
 const STORAGE_KEY = 'what-starter-oscillator-pattern';
 
@@ -8,16 +8,21 @@ function loadSavedPattern() {
   const fallback = clonePattern(presets[0]);
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return fallback;
+    if (!raw) return { pattern: fallback, restored: false };
     const parsed = JSON.parse(raw);
-    return sanitizePattern(parsed, fallback);
+    return { pattern: sanitizePattern(parsed, fallback), restored: isValidPattern(parsed) };
   } catch {
-    return fallback;
+    return { pattern: fallback, restored: false };
   }
 }
 
-export const currentPresetId = signal('brass-grid');
-export const pattern = signal(loadSavedPattern());
+const initial = loadSavedPattern();
+export const pattern = signal(initial.pattern);
+const savedSnapshot = signal(JSON.stringify(pattern()));
+export const currentPresetId = computed(() => presets.find((preset) => JSON.stringify(preset) === JSON.stringify(pattern()))?.id || '');
+export const hasUnsavedChanges = computed(() => JSON.stringify(pattern()) !== savedSnapshot());
+export const patchIdentity = computed(() => `${pattern().name}${currentPresetId() ? ' · preset' : ' · custom'}`);
+export const memoryStatus = signal(initial.restored ? 'Saved pattern restored from this browser.' : 'Edits stay in this session until you save locally.');
 export const isPlaying = signal(false);
 export const currentStep = signal(0);
 export const audioStatus = signal('Audio stopped. Press Start audio to enable playback.');
@@ -36,7 +41,6 @@ export function setSwing(value) {
 
 export function loadPreset(id) {
   const preset = presets.find((item) => item.id === id) || presets[0];
-  currentPresetId(preset.id);
   pattern(clonePattern(preset));
   currentStep(0);
   audioStatus(`Loaded ${preset.name}.`);
@@ -71,13 +75,25 @@ export function setTrackFrequency(trackId, value) {
 }
 
 export function savePattern() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(pattern()));
-  audioStatus('Pattern saved in localStorage.');
+  try {
+    const snapshot = JSON.stringify(pattern());
+    localStorage.setItem(STORAGE_KEY, snapshot);
+    savedSnapshot(snapshot);
+    memoryStatus('Pattern saved in this browser.');
+  } catch {
+    memoryStatus('Pattern not saved. Keep this session open or export JSON.');
+  }
 }
 
 export function resetSavedPattern() {
-  localStorage.removeItem(STORAGE_KEY);
-  loadPreset(currentPresetId());
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    loadPreset(pattern().id);
+    savedSnapshot(JSON.stringify(pattern()));
+    memoryStatus('Local save removed. Source preset restored for this session.');
+  } catch {
+    memoryStatus('Could not remove the local save. Your current pattern is unchanged.');
+  }
 }
 
 export function exportPattern() {

@@ -2,7 +2,7 @@
 
 ## Source of truth
 - Status: Active
-- Last refreshed: 2026-10-01
+- Last refreshed: 2026-10-07
 - Primary product surfaces: Home, studio, build reference, 404
 - Evidence reviewed: public What Framework package patterns, browser Web Audio constraints, Vura static deployment needs
 
@@ -25,6 +25,7 @@
 - Primary navigation: Home, Studio, Build notes
 - Core routes/screens: `/`, `/studio`, `/build`, `/404`
 - Content hierarchy: landing pitch, transport, presets, sequencer grid, implementation reference
+- Working studio hierarchy: compact patch identity, transport, sequencer, pattern memory. The mobile sequencer precedes storage controls; the landing page keeps the expressive hardware composition.
 
 ## Design principles
 - Principle 1: Every sound control must be a real accessible control
@@ -43,6 +44,7 @@
 - Existing components to reuse: What Router and What signals
 - New/changed components: `Transport`, `PresetPanel`, `Sequencer`
 - Variants and states: playing, muted, soloed, active preset, browser error, saved pattern
+- Memory states: exact preset, custom edit, changed since snapshot, successful local save, denied write/remove with recoverable feedback. A preset highlight must match the entire pattern, including tempo, swing and tracks.
 - Token/component ownership: CSS variables in `src/styles.css`
 
 ## Accessibility
@@ -55,6 +57,7 @@
 ## Responsive behavior
 - Supported breakpoints/devices: desktop, tablet, mobile browsing
 - Layout adaptations: preset panel and sequencer stack on narrow screens, steps become two rows of eight
+- Narrow-screen targets: recover studio width and reduce row padding so the eight-step grid retains at least 44px height and useful tap width at 390px; beat boundaries distinguish groups of four.
 - Touch/hover differences: all controls work by click or tap
 
 ## Interaction states
