@@ -2,7 +2,7 @@
 
 ## Source of truth
 - Status: Active
-- Last refreshed: 2026-10-07
+- Last refreshed: 2026-10-08
 - Primary product surfaces: Home, studio, build reference, 404
 - Evidence reviewed: public What Framework package patterns, browser Web Audio constraints, Vura static deployment needs
 
@@ -33,10 +33,10 @@
 - Tradeoffs: synthesis is intentionally simple so the starter stays dependency-free
 
 ## Visual language
-- Color: near-black base, amber and brass controls, red danger, green playhead
-- Typography: instrument-label sans plus old-world display for drama
+- Color: quiet dark graphite base, muted amber and brass controls, red danger, green playhead
+- Typography: local humanist sans for headings, copy and controls; monospace only for code
 - Spacing/layout rhythm: console-like panels and tight control grids
-- Shape/radius/elevation: rounded hardware buttons, hard panel borders
+- Shape/radius/elevation: consistent 8px button corners, quiet panel borders
 - Motion: playhead outline only, reduced-motion safe
 - Imagery/iconography: no external images; controls are the visual language
 
@@ -56,8 +56,8 @@
 
 ## Responsive behavior
 - Supported breakpoints/devices: desktop, tablet, mobile browsing
-- Layout adaptations: preset panel and sequencer stack on narrow screens, steps become two rows of eight
-- Narrow-screen targets: recover studio width and reduce row padding so the eight-step grid retains at least 44px height and useful tap width at 390px; beat boundaries distinguish groups of four.
+- Layout adaptations: pattern memory stacks below the sequencer at tablet widths; the ruler and steps become two rows of eight. At 380px and below, both use four columns so all sixteen steps remain independently editable without overlapping hit areas.
+- Narrow-screen targets: recover studio width and reduce row padding so the eight-step grid retains at least 44px height and useful tap width at 390px; four-column rows protect the same target at 360px. Beat boundaries distinguish groups of four. Browser checks assert neighboring step rectangles do not overlap at desktop, tablet and narrow-phone widths.
 - Touch/hover differences: all controls work by click or tap
 
 ## Interaction states
@@ -82,3 +82,11 @@
 
 ## Open questions
 - [ ] Final public URL and Vura project id, root agent owns deployment
+
+## Shared modern chrome contract
+
+- Typography: "Avenir Next", "Segoe UI Variable", "Segoe UI", sans-serif; no font downloads. Body 16px/1.6, labels and controls 14px. Monospace is limited to code and structured readouts.
+- Hierarchy: prose, build and detail headings stay within 36–44px on desktop and 28–32px on mobile. The home composition follows the same bounded hierarchy while preserving its primary art, instrument, gear or data surface.
+- Geometry: 8px spacing rhythm, restrained 8px control corners, at least 44px interactive control height, visible two-pixel focus outlines, explicit selected/disabled states.
+- Surfaces: flat theme backgrounds, solid content surfaces, subtle borders; no global decorative grids, repeating textures, heavy shadows or control pills.
+- Ownership: this is a presentation pass. Existing generation, audio, quote/receipt and server-render/cache contracts remain unchanged.
