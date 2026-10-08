@@ -171,3 +171,7 @@ npm run smoke
 ```
 
 The important lifecycle regression proof is `src/audio/engine.lifecycle.test.js`. Browser smoke tests cover controls, routing, the sixteen-cell ruler, the stopped playhead state, and desktop/mobile studio screenshots. The Web Audio race still needs the focused unit test because it depends on async scheduling order.
+
+## Presentation contract
+
+The stylesheet uses local Avenir/Segoe sans fallbacks, 16px body copy, 14px labels and controls, bounded build/detail headings, and 44px controls. Code and structured readouts keep their monospace role. Theme identity comes from the real art, instrument, gear or status data rather than decorative page texture. Browser checks assert this contract alongside the existing behavior tests. Keep source/public CSS synchronized where server-rendered packaging requires it.

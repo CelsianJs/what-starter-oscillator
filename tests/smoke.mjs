@@ -38,9 +38,11 @@ try {
 
   await page.goto(baseURL, { waitUntil: 'networkidle' });
   await page.getByRole('heading', { name: /Make the next thing/i }).waitFor();
+  await assertModernChrome(page);
   await page.screenshot({ path: 'test-artifacts/oscillator-desktop-home.png', fullPage: true });
 
   await page.goto(`${baseURL}/studio`, { waitUntil: 'networkidle' });
+  await assertModernChrome(page);
   const stepHeaderCount = await page.locator('.step-numbers span').count();
   if (stepHeaderCount !== 16) {
     throw new Error(`Expected 16 visible step header numbers, found ${stepHeaderCount}`);
@@ -64,8 +66,14 @@ try {
   await page.getByRole('heading', { name: /Make a little noise/i }).waitFor();
   await page.screenshot({ path: 'test-artifacts/oscillator-desktop-studio.png', fullPage: true });
 
+  await page.setViewportSize({ width: 1024, height: 900 });
+  await page.goto(`${baseURL}/studio`, { waitUntil: 'networkidle' });
+  await assertModernChrome(page);
+  await page.screenshot({ path: 'test-artifacts/oscillator-tablet-studio.png', fullPage: true });
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${baseURL}/studio`, { waitUntil: 'networkidle' });
+  await assertModernChrome(page);
   const mobileStepColumns = await page.locator('.step-numbers').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
   if (mobileStepColumns !== 8) {
     throw new Error(`Mobile step header should wrap as 8 columns, found ${mobileStepColumns}`);
@@ -82,8 +90,20 @@ try {
   await page.getByRole('button', { name: 'Reset saved' }).click();
   await page.getByText(/Could not remove/).waitFor();
   await page.screenshot({ path: 'test-artifacts/oscillator-mobile-studio.png', fullPage: true });
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto(`${baseURL}/studio`, { waitUntil: 'networkidle' });
+  await assertModernChrome(page);
+  const narrowColumns = await page.locator('.step-numbers').evaluate((node) => getComputedStyle(node).gridTemplateColumns.split(' ').length);
+  if (narrowColumns !== 4) throw new Error(`Narrow phone ruler must have four non-overlapping columns, found ${narrowColumns}`);
+  const finalStep = page.getByRole('button', { name: 'Kick step 16' });
+  const beforeFinalStep = await finalStep.getAttribute('aria-pressed');
+  await finalStep.click();
+  if (await finalStep.getAttribute('aria-pressed') === beforeFinalStep) throw new Error('Narrow phone step 16 must remain editable.');
+  await page.screenshot({ path: 'test-artifacts/oscillator-narrow-studio.png', fullPage: true });
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${baseURL}/build`, { waitUntil: 'networkidle' });
   await page.getByRole('heading', { name: /How Oscillator is built/i }).waitFor();
+  await assertModernChrome(page);
   await page.screenshot({ path: 'test-artifacts/oscillator-mobile-build.png', fullPage: true });
   const guideWidths = [await page.evaluate(() => ({ font: 'default', viewport: innerWidth, document: document.documentElement.scrollWidth }))];
   await page.addStyleTag({ content: '.build-page pre code { font-family: "Courier New", monospace; font-size: 18px; letter-spacing: .8px; }' });
@@ -101,4 +121,23 @@ try {
 } finally {
   if (browser) await browser.close().catch(() => {});
   await stopOwnedProcess(server, { logs, label: 'Oscillator Vite preview' });
+}
+
+async function assertModernChrome(page) {
+  const styles = await page.evaluate(() => ({
+    family: getComputedStyle(document.body).fontFamily,
+    bodySize: parseFloat(getComputedStyle(document.body).fontSize),
+    background: getComputedStyle(document.body).backgroundImage,
+    heading: parseFloat(getComputedStyle(document.querySelector('h1')).fontSize),
+    targets: [...document.querySelectorAll('.brand, .button, .micro, .preset, .step, .nav a, input[type="range"]')].map((node) => node.getBoundingClientRect().height),
+    stepOverlap: [...document.querySelectorAll('.steps')].some((row) => [...row.children].some((node, index, nodes) => {
+      if (index === 0) return false;
+      const current = node.getBoundingClientRect();
+      const previous = nodes[index - 1].getBoundingClientRect();
+      return Math.abs(current.top - previous.top) < 1 && current.left < previous.right - .5;
+    })),
+  }));
+  if (!/Avenir|Segoe/.test(styles.family) || styles.bodySize !== 16 || styles.background !== 'none') throw new Error(`Modern type/surface contract failed: ${JSON.stringify(styles)}`);
+  const headingLimit = page.url().endsWith('/studio') || page.url().endsWith('/build') ? 44 : 56;
+  if (styles.heading > headingLimit || styles.targets.some((height) => height < 44) || styles.stepOverlap) throw new Error(`Unbounded type or unusable control: ${JSON.stringify(styles)}`);
 }
