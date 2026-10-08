@@ -41,6 +41,14 @@ try {
   await assertModernChrome(page);
   await page.screenshot({ path: 'test-artifacts/oscillator-desktop-home.png', fullPage: true });
 
+  for (const viewport of [{ width: 1024, height: 900 }, { width: 390, height: 844 }, { width: 360, height: 800 }]) {
+    await page.setViewportSize(viewport);
+    await page.goto(baseURL, { waitUntil: 'networkidle' });
+    await assertModernChrome(page);
+    await page.screenshot({ path: `test-artifacts/oscillator-home-${viewport.width}.png`, fullPage: true });
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 });
+
   await page.goto(`${baseURL}/studio`, { waitUntil: 'networkidle' });
   await assertModernChrome(page);
   const stepHeaderCount = await page.locator('.step-numbers span').count();
@@ -138,6 +146,6 @@ async function assertModernChrome(page) {
     })),
   }));
   if (!/Avenir|Segoe/.test(styles.family) || styles.bodySize !== 16 || styles.background !== 'none') throw new Error(`Modern type/surface contract failed: ${JSON.stringify(styles)}`);
-  const headingLimit = page.url().endsWith('/studio') || page.url().endsWith('/build') ? 44 : 56;
+  const headingLimit = page.url().endsWith('/studio') || page.url().endsWith('/build') ? 44 : page.viewportSize().width <= 520 ? 32 : 48;
   if (styles.heading > headingLimit || styles.targets.some((height) => height < 44) || styles.stepOverlap) throw new Error(`Unbounded type or unusable control: ${JSON.stringify(styles)}`);
 }

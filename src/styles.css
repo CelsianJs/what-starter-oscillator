@@ -45,7 +45,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .memory-status { color: var(--amber); line-height: 1.5; font-size: .875rem; }
 .hero { min-height: 720px; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(360px, 0.9fr); gap: 3rem; align-items: center; }
 h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.025em; line-height: 1.1; margin: 0; font-size: clamp(2rem, 3.5vw, 2.75rem); }
-.hero h1 { max-width: 12ch; font-size: clamp(2.5rem, 4vw, 3.5rem); }
+.hero h1 { max-width: 12ch; font-size: clamp(2rem, 3.5vw, 3rem); }
 .build-page h1 { max-width: 24ch; }
 .lede, .studio-heading p, .not-found p { max-width: 760px; color: var(--muted); font-size: 1rem; line-height: 1.55; }
 .eyebrow { margin: 0 0 0.9rem; color: var(--amber); font-weight: 600; letter-spacing: 0.01em; font-size: 0.875rem; }
